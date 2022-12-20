@@ -1,6 +1,13 @@
-FROM golang:latest
+FROM golang:alpine AS builder
 
-WORKDIR /usr/app
+WORKDIR $GOPATH/src/app
 
-RUN go mod init hello && \
-  go run .
+COPY . .
+
+RUN CGO_ENABLED=0 go build -o /app hello.go
+
+FROM scratch
+
+COPY --from=builder /app .
+
+CMD ["/app"]
